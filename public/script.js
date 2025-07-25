@@ -2,7 +2,103 @@ const dropArea = document.getElementById('drop-area');
 const convertButton = document.getElementById('convert-button');
 const downloadLinkContainer = document.getElementById('download-link-container');
 
+// Dictionary elements
+const originalStringInput = document.getElementById('original-string');
+const replacementStringInput = document.getElementById('replacement-string');
+const addToDictionaryButton = document.getElementById('add-to-dictionary');
+const dictionaryList = document.getElementById('dictionary-list');
+
 let fileContent = '';
+let dictionary = []; // Stores dictionary entries
+
+// --- Dictionary Functions ---
+
+function loadDictionary() {
+    const savedDictionary = localStorage.getItem('dictionary');
+    if (savedDictionary) {
+        dictionary = JSON.parse(savedDictionary);
+    }
+    renderDictionary();
+}
+
+function saveDictionary() {
+    localStorage.setItem('dictionary', JSON.stringify(dictionary));
+}
+
+function renderDictionary() {
+    dictionaryList.innerHTML = '';
+    if (dictionary.length === 0) {
+        const li = document.createElement('li');
+        li.textContent = '辞書エントリはまだありません。';
+        dictionaryList.appendChild(li);
+        return;
+    }
+    dictionary.forEach((entry, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <span>${entry.original} → ${entry.replacement}</span>
+            <button data-index="${index}">削除</button>
+        `;
+        dictionaryList.appendChild(li);
+    });
+}
+
+function addOrUpdateDictionaryEntry() {
+    const original = originalStringInput.value.trim();
+    const replacement = replacementStringInput.value.trim();
+
+    if (!original || !replacement) {
+        alert('元の文字列と変換後のひらがなを入力してください。');
+        return;
+    }
+
+    // Check if entry already exists and update
+    const existingIndex = dictionary.findIndex(entry => entry.original === original);
+    if (existingIndex > -1) {
+        dictionary[existingIndex].replacement = replacement;
+    } else {
+        dictionary.push({ original, replacement });
+    }
+
+    saveDictionary();
+    renderDictionary();
+    originalStringInput.value = '';
+    replacementStringInput.value = '';
+}
+
+function deleteDictionaryEntry(index) {
+    dictionary.splice(index, 1);
+    saveDictionary();
+    renderDictionary();
+}
+
+function applyDictionary(text) {
+    let processedText = text;
+    dictionary.forEach(entry => {
+        // 正規表現でグローバルに置換するためにRegExpオブジェクトを使用
+        // エスケープが必要な特殊文字を考慮
+        if (entry.original.length === 0) { return; }
+        const escapedOriginal = entry.original.replace(/[.*+?^${}()|[\\]]/g, '\\$&');
+        const regex = new RegExp(escapedOriginal, 'g');
+        processedText = processedText.replace(regex, entry.replacement);
+    });
+    return processedText;
+}
+
+// --- Event Listeners ---
+
+document.addEventListener('DOMContentLoaded', loadDictionary); // Load dictionary on page load
+
+addToDictionaryButton.addEventListener('click', addOrUpdateDictionaryEntry);
+
+dictionaryList.addEventListener('click', (event) => {
+    if (event.target.tagName === 'BUTTON' && event.target.textContent === '削除') {
+        const index = parseInt(event.target.dataset.index);
+        if (!isNaN(index)) {
+            deleteDictionaryEntry(index);
+        }
+    }
+});
 
 dropArea.addEventListener('dragover', (event) => {
     event.preventDefault();
@@ -80,7 +176,12 @@ convertButton.addEventListener('click', () => {
     console.log("--- Raw Content from File ---");
     console.log(fileContent);
 
-    const lines = fileContent.split(/\r?\n|\r/).filter(line => line.trim() !== '');
+    // Apply dictionary replacements before splitting into lines
+    const processedFileContent = applyDictionary(fileContent);
+    console.log("--- Content after Dictionary Applied ---");
+    console.log(processedFileContent);
+
+    const lines = processedFileContent.split(/\r?\n|\r/).filter(line => line.trim() !== '');
     
     console.log("--- Split Lines ---");
     console.log(lines);
