@@ -35,3 +35,59 @@ button {
     text-decoration: none;
     border-radius: 4px;
 }
+
+hr {
+    width: 80%;
+    margin: 2rem 0;
+    border: 0;
+    border-top: 1px solid #eee;
+}
+
+h2,
+h3 {
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+#dictionary-input {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+#dictionary-input input[type="text"] {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#dictionary-list {
+    list-style: none;
+    padding: 0;
+    width: 80%;
+    max-width: 600px;
+}
+
+#dictionary-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    background-color: #f9f9f9;
+}
+
+#dictionary-list li button {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 0.3rem 0.6rem;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+#dictionary-list li button:hover {
+    background-color: #c82333;
+}

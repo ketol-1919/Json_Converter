@@ -14,6 +14,19 @@
     <button id="convert-button" disabled>変換</button>
     <div id="download-link-container"></div>
 
+    <hr>
+
+    <h2>辞書管理</h2>
+    <div id="dictionary-input">
+        <input type="text" id="original-string" placeholder="元の文字列">
+        <input type="text" id="replacement-string" placeholder="変換後のひらがな">
+        <button id="add-to-dictionary">辞書に追加/更新</button>
+    </div>
+    <div id="dictionary-list-container">
+        <h3>現在の辞書エントリ</h3>
+        <ul id="dictionary-list"></ul>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
     <script src="public/script.js"></script>
 </body>
